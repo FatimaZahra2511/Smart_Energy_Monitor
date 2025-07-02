@@ -99,7 +99,7 @@ Smart_Energy_Monitor/
 
 ---
 
-## 👩‍💻 Contributors
+## Contributors
 
 - **Fatima Zahra Zhiri** -
 - **Oumaima Ouajjou** — 
