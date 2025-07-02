@@ -1,13 +1,13 @@
 
-# 💡 Smart Energy Monitor – IoT-Based Embedded System Project
+#  Smart Energy Monitor – IoT-Based Embedded System Project
 
 This project is a **cloud-connected, simulated Smart Energy Monitoring System** designed using the **Particle Photon microcontroller**, Particle Cloud, and a custom-built web dashboard. It enables real-time appliance control, simulated energy tracking, overload detection, scheduling, and smart energy tips — all without requiring real electrical hardware.
 
-> 🛠️ Built for the CSC3328 Embedded Systems course at Al Akhawayn University.
+>  Built for the CSC3328 Embedded Systems course.
 
 ---
 
-## 📦 Project Structure
+##  Project Structure
 
 ```
 Smart_Energy_Monitor/
@@ -15,27 +15,26 @@ Smart_Energy_Monitor/
 ├── dashboard/       # HTML, CSS, and JS files (frontend)
 ├── paper/           # Final IEEE-style report (DOC)
 ├── poster/          # Academic poster (PPT)
-├── Demo/            # Optional demo videos/images
 ├── README.md
-└── LICENSE
+
 ```
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
-- ✅ Real-time control of simulated appliances: Heater, Fridge, AC
-- 🌡️ Potentiometer-based temperature simulation triggers automatic heater/AC control
-- ⚠️ Overload detection using blinking LED (if simulated load > 2000W)
-- 📈 Live energy usage graphs (Chart.js)
-- 💰 Daily consumption & cost estimation
-- 📅 Appliance scheduling (on/off at specific times)
-- 💡 Smart energy-saving tip generator
-- 📄 CSV log export of usage history
+- Real-time control of simulated appliances: Heater, Fridge, AC
+- Potentiometer-based temperature simulation triggers automatic heater/AC control
+- Overload detection using blinking LED (if simulated load > 2000W)
+- Live energy usage graphs (Chart.js)
+- Daily consumption & cost estimation
+- Appliance scheduling (on/off at specific times)
+- Smart energy-saving tip generator
+- CSV log export of usage history
 
 ---
 
-## 🌐 Technologies Used
+##  Technologies Used
 
 | Layer            | Tech Stack                             |
 |------------------|-----------------------------------------|
@@ -47,7 +46,7 @@ Smart_Energy_Monitor/
 
 ---
 
-## 🖥️ Dashboard Preview
+## Dashboard Preview
 
 > A responsive web UI that communicates with the cloud-connected microcontroller in real time.
 
@@ -62,24 +61,24 @@ Smart_Energy_Monitor/
 
 ## 📄 Documentation
 
-- 📘 `Ouajjou_Zhiri_Toreis_Paper.doc` — Full technical report (IEEE format)
-- 🖼️ `poster embedded systems project.ppt` — Presentation poster
-- 💾 `Firmware_Final.txt` — Source code for microcontroller
-- 🌐 `SmartEnergyMonitor_Final_Embedded.html` — Frontend dashboard
+-  `Ouajjou_Zhiri_Toreis_Paper.doc` — Full technical report (IEEE format)
+-  `poster embedded systems project.ppt` — Presentation poster
+-  `Firmware_Final.txt` — Source code for microcontroller
+-  `SmartEnergyMonitor_Final_Embedded.html` — Frontend dashboard
 
 ---
 
-## 🧪 Testing & Results
+##  Testing & Results
 
-- 💬 Dashboard-to-device response time: ~1 second
-- 🧠 Accurate temperature-based automation
-- ⚠️ Overload detection triggered when total simulated wattage exceeds 2000W
-- 📅 Scheduler executed actions with <1 second drift
-- 📉 CSV logs matched usage accurately
+-  Dashboard-to-device response time: ~1 second
+-  Accurate temperature-based automation
+-  Overload detection triggered when total simulated wattage exceeds 2000W
+-  Scheduler executed actions with <1 second drift
+-  CSV logs matched usage accurately
 
 ---
 
-## 📈 Comparison with Real-World Solutions
+##  Comparison with Real-World Solutions
 
 | Feature                   | Traditional Meters | Commercial Smart Meters | This Project |
 |---------------------------|---------------------|--------------------------|--------------|
@@ -90,7 +89,7 @@ Smart_Energy_Monitor/
 
 ---
 
-## 🔐 Future Improvements
+## Future Improvements
 
 - Integrate actual power sensors (voltage/current)
 - Add user authentication to the dashboard
@@ -102,58 +101,15 @@ Smart_Energy_Monitor/
 
 ## 👩‍💻 Contributors
 
-- **Fatima Zahra Zhiri** — [`F.Zhiri@aui.ma`](mailto:F.Zhiri@aui.ma)
-- **Oumaima Ouajjou** — [`O.Ouajjou@aui.ma`](mailto:O.Ouajjou@aui.ma)
-- **Kenza Toreis** — [`K.Toreis@aui.ma`](mailto:K.Toreis@aui.ma)
-
-Special thanks to **Dr. Fiaz Ahmed** for mentorship and technical guidance.
+- **Fatima Zahra Zhiri** -
+- **Oumaima Ouajjou** — 
+- **Kenza Toreis** —
 
 ---
 
-## 📜 License
+## How to Run the Project Locally
 
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-> For questions, collaboration, or improvements — feel free to fork, star ⭐, or open an issue.
-
-
----
-
-## 📸 Screenshots
-
-### 🔌 Real-Time Dashboard Control
-Control each appliance (Heater, Fridge, AC) using the web interface and view the updated status instantly.
-
-### 📊 Live Power Graph (Chart.js)
-A dynamic line graph updates every second showing current power consumption.
-
-### ⚠️ Overload Warning
-If the simulated power exceeds 2000W, a warning message and LED blink are triggered.
-
-### 🧠 Smart Energy Tips
-Based on appliance usage patterns, the system offers real-time suggestions to optimize energy efficiency.
-
----
-
-## 🧠 Educational Impact
-
-This project was designed with **academic training and IoT simulation** in mind. It:
-- Demonstrates cloud-based embedded system integration.
-- Provides a safe, low-cost environment for testing smart home concepts.
-- Encourages understanding of real-time systems, scheduling, and data visualization.
-
-It is ideal for:
-- Undergraduate embedded systems or IoT courses
-- Hackathons or rapid prototyping
-- Proof-of-concept smart energy apps
-
----
-
-## 📂 How to Run the Project Locally
-
-### 1. Photon Microcontroller Setup
+### 1. Photon Particle Microcontroller Setup
 - Flash the firmware from `firmware/Firmware_Final.txt` to your Particle Photon using the Particle Web IDE or CLI.
 - Ensure the device is connected to Wi-Fi and registered to your Particle account.
 
@@ -170,7 +126,7 @@ It is ideal for:
 
 ---
 
-## 🛡️ Security Considerations
+## Security Considerations
 
 This is an educational prototype. However, future secure deployments should:
 - Implement HTTPS and user authentication
@@ -180,7 +136,7 @@ This is an educational prototype. However, future secure deployments should:
 
 ---
 
-## 🧰 Recommended Tools
+## Recommended Tools
 
 - [Particle Web IDE](https://build.particle.io/)
 - [Particle CLI](https://docs.particle.io/tutorials/developer-tools/cli/)
@@ -190,12 +146,4 @@ This is an educational prototype. However, future secure deployments should:
 
 ---
 
-## 📞 Contact
-
-Feel free to reach out for collaborations, mentorship, or contributions:
-
-- 📧 Fatima Zahra Zhiri — [F.Zhiri@aui.ma](mailto:F.Zhiri@aui.ma)
-- 💼 [GitHub Portfolio](https://github.com/FatimaZahra2511)
-
----
 
