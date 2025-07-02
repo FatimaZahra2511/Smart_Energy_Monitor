@@ -1,0 +1,58 @@
+int heaterState = 0, fridgeState = 0, acState = 0;
+int totalPower = 0;
+int temperature = 0;
+
+const int TEMP_PIN = A0;       // Potentiometer
+const int STATUS_LED = D7;     // Onboard LED
+const int OVERLOAD_LED = D3;   // External flashing LED
+
+int controlAppliance(String command) {
+    if (command == "heater_on") heaterState = 1;
+    else if (command == "heater_off") heaterState = 0;
+    else if (command == "fridge_on") fridgeState = 1;
+    else if (command == "fridge_off") fridgeState = 0;
+    else if (command == "ac_on") acState = 1;
+    else if (command == "ac_off") acState = 0;
+    else return -1;
+    return 1;
+}
+
+void setup() {
+    pinMode(TEMP_PIN, INPUT);
+    pinMode(STATUS_LED, OUTPUT);
+    pinMode(OVERLOAD_LED, OUTPUT);
+
+    digitalWrite(STATUS_LED, LOW);
+    digitalWrite(OVERLOAD_LED, LOW);
+
+    Particle.function("control", controlAppliance);
+    Particle.variable("totalPower", totalPower);
+    Particle.variable("temperature", temperature);
+}
+
+void loop() {
+    // Read potentiometer to simulate temperature
+    int raw = analogRead(TEMP_PIN);
+    temperature = map(raw, 0, 4095, 0, 100);  /
+    if (temperature >= 30) {
+        heaterState = 1;
+    }
+       totalPower = heaterState * 1000 + fridgeState * 200 + acState * 1500;
+
+    // Turn onboard LED D7 ON if any appliance is ON
+    if (heaterState || fridgeState || acState) {
+        digitalWrite(STATUS_LED, HIGH);
+    } else {
+        digitalWrite(STATUS_LED, LOW);
+    }
+
+    // If overload (power > 2000W), flash external LED D3 urgently
+    if (totalPower > 2000) {
+        digitalWrite(OVERLOAD_LED, HIGH);
+        delay(250);
+        digitalWrite(OVERLOAD_LED, LOW);
+        delay(250);
+    } else {
+        digitalWrite(OVERLOAD_LED, LOW);
+        delay(1000);      }
+}

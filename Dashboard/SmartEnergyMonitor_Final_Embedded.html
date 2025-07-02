@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Energy Monitor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #e8f5e9;
+      padding: 2rem;
+      color: #2e7d32;
+      margin: 0;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #a5d6a7;
+    }
+    header img {
+      height: 50px;
+    }
+    h2 {
+      flex: 1;
+      text-align: center;
+      color: #1b5e20;
+      margin: 0;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+    button, select, input[type="time"] {
+      padding: 10px 15px;
+      font-size: 1rem;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      background-color: #66bb6a;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    .grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #c8e6c9;
+      padding: 0.5rem;
+      text-align: center;
+      background: white;
+    }
+    th {
+      background-color: #dcedc8;
+    }
+    #warning {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+    .tips {
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #33691e;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="https://uxwing.com/wp-content/themes/uxwing/download/nature-and-environment/energy-green-icon.png" alt="Energy Icon">
+  <h2>Smart Energy Monitor</h2>
+</header>
+
+<div class="card">
+  <p>Status: <span id="status">OFF</span></p>
+  <p>Active Appliances: <span id="appliances">None</span></p>
+  <p>Total Power: <span id="power">0</span> W</p>
+  <p>Estimated Daily Consumption: <span id="dailyEstimate">0</span> Wh</p>
+  <p id="costEstimate">Estimated Cost: 0.00 MAD</p>
+  <p id="warning"></p>
+</div>
+
+<div class="card grid">
+  <button onclick="toggle('heater_on')">Heater ON</button>
+  <button onclick="toggle('heater_off')">Heater OFF</button>
+  <button onclick="toggle('fridge_on')">Fridge ON</button>
+  <button onclick="toggle('fridge_off')">Fridge OFF</button>
+  <button onclick="toggle('ac_on')">AC ON</button>
+  <button onclick="toggle('ac_off')">AC OFF</button>
+</div>
+
+<div class="card">
+  <h3>Schedule Appliance Toggles</h3>
+  <div id="scheduleInputs"></div>
+  <button onclick="addScheduleRow()">+ Add Another Schedule</button>
+</div>
+
+<div class="card">
+  <h3>Smart Energy Tip</h3>
+  <p id="smartTip" class="tips">Waiting for usage pattern...</p>
+</div>
+
+<div class="card">
+  <button onclick="downloadCSV()">📥 Download CSV Log</button>
+</div>
+
+<div class="card">
+  <canvas id="forecastChart" width="600" height="300"></canvas>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Time</th><th>Status</th><th>Power (W)</th></tr></thead>
+    <tbody id="logTable"></tbody>
+  </table>
+</div>
+
+<script>
+  const deviceID = "520042001051373331333230";
+  const accessToken = "fc2f3a98e2d713b0ccf423d9121dfe0af4b9b93e";
+  const pricePerWh = 0.0012; // 1.2 MAD/kWh
+
+  let powerHistory = [], logArray = [];
+  let applianceUptime = { heater: 0, fridge: 0, ac: 0 };
+
+  function toggle(state) {
+    fetch(`https://api.particle.io/v1/devices/${deviceID}/control`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `access_token=${accessToken}&arg=${state}`
+    }).then(() => {
+      document.getElementById("status").innerText = state.toUpperCase();
+    });
+  }
+
+  async function getPower() {
+    const res = await fetch(`https://api.particle.io/v1/devices/${deviceID}/totalPower?access_token=${accessToken}`);
+    const data = await res.json();
+    const power = parseInt(data.result);
+    document.getElementById("power").innerText = power;
+
+    const dailyEstimate = Math.round((power * 24 * 60 * 60) / 1000);
+    const costEstimate = (dailyEstimate * pricePerWh).toFixed(2);
+    document.getElementById("dailyEstimate").innerText = dailyEstimate + " Wh";
+    document.getElementById("costEstimate").innerText = "Estimated Cost: " + costEstimate + " MAD";
+    document.getElementById("warning").innerText = power > 2000 ? "⚠️ Overload Warning!" : "";
+
+    const now = new Date().toLocaleTimeString();
+    const status = document.getElementById("status").innerText;
+    const row = `<tr><td>${now}</td><td>${status}</td><td>${power}</td></tr>`;
+    document.getElementById("logTable").insertAdjacentHTML('afterbegin', row);
+    logArray.unshift([now, status, power]);
+
+    let active = [];
+    if (status.includes("HEATER_ON")) { active.push("Heater"); applianceUptime.heater++; }
+    if (status.includes("FRIDGE_ON")) { active.push("Fridge"); applianceUptime.fridge++; }
+    if (status.includes("AC_ON")) { active.push("AC"); applianceUptime.ac++; }
+    document.getElementById("appliances").innerText = active.length ? active.join(", ") : "None";
+
+    const nowLabel = new Date().toLocaleTimeString();
+    powerHistory.push(power);
+    chart.data.labels.push(nowLabel);
+    chart.data.datasets[0].data.push(power);
+    if (chart.data.labels.length > 60) {
+      chart.data.labels.shift();
+      chart.data.datasets[0].data.shift();
+    }
+    chart.update();
+
+    updateSmartTips();
+  }
+
+  function updateSmartTips() {
+    let tip = "You're doing great with energy savings!";
+    if (applianceUptime.heater > 5) tip = "🌡️ The heater's been on a lot. Consider turning it off.";
+    else if (applianceUptime.ac > 5) tip = "❄️ AC usage is high. Is it needed constantly?";
+    else if (applianceUptime.fridge > 5) tip = "🧊 Fridge has consistent usage. All good!";
+    document.getElementById("smartTip").innerText = tip;
+  }
+
+  function addScheduleRow() {
+    const container = document.getElementById("scheduleInputs");
+    const id = Date.now();
+    const html = `
+      <div id="row-${id}" style="margin-bottom:10px;">
+        <select id="appliance-${id}">
+          <option value="heater_on">Heater ON</option>
+          <option value="heater_off">Heater OFF</option>
+          <option value="fridge_on">Fridge ON</option>
+          <option value="fridge_off">Fridge OFF</option>
+          <option value="ac_on">AC ON</option>
+          <option value="ac_off">AC OFF</option>
+        </select>
+        <input type="time" id="time-${id}">
+        <button onclick="scheduleAction('${id}')">Schedule</button>
+      </div>`;
+    container.insertAdjacentHTML("beforeend", html);
+  }
+
+  function scheduleAction(id) {
+    const action = document.getElementById(`appliance-${id}`).value;
+    const time = document.getElementById(`time-${id}`).value;
+    if (!time) return alert("⏰ Please set a time.");
+    const [h, m] = time.split(":").map(Number);
+    const now = new Date();
+    const target = new Date();
+    target.setHours(h, m, 0);
+    const delay = target.getTime() - now.getTime();
+    if (delay < 0) return alert("⚠️ Time must be in the future!");
+    setTimeout(() => toggle(action), delay);
+    alert(`Scheduled '${action}' for ${target.toLocaleTimeString()}`);
+  }
+
+  function downloadCSV() {
+    const rows = [["Time", "Status", "Power (W)"], ...logArray];
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "power_log.csv");
+    document.body.appendChild(link);
+    link.click();
+  }
+
+  setInterval(getPower, 1000);
+
+  const ctx = document.getElementById('forecastChart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Live Power Usage (W)',
+        data: [],
+        borderColor: 'green',
+        borderWidth: 2,
+        fill: false
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Watts' }},
+        x: { title: { display: true, text: 'Time' }}
+      }
+    }
+  });
+</script>
+</body>
+</html>
